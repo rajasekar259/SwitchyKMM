@@ -31,3 +31,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+iOSSampleApp/Pods/Pods.xcodeproj/xcuserdata
+iOSSampleApp/Pods
+iOSSampleApp/iOSSampleApp.xcworkspace/xcuserdata
