@@ -1,0 +1,75 @@
+import kotlin.Long;
+
+-- HOUSE POWER TABLES
+createHousePowerUsageTableIfNeeded:
+CREATE TABLE IF NOT EXISTS DBHousePowerUsage (
+  epochMilliSeconds INTEGER AS Long PRIMARY KEY,
+  power REAL NOT NULL DEFAULT 0
+);
+
+insertHousePowerUsage:
+INSERT OR REPLACE INTO DBHousePowerUsage VALUES ?;
+
+getHousePowerUsage:
+SELECT * FROM DBHousePowerUsage
+WHERE epochMilliSeconds BETWEEN :from AND :to
+;
+
+getAllHousePowerUsage:
+SELECT * FROM DBHousePowerUsage;
+
+removeHousePowerUsage:
+DELETE FROM DBHousePowerUsage
+WHERE epochMilliSeconds BETWEEN :from AND :to
+;
+
+removeAllHousePowerUsage:
+DELETE FROM DBHousePowerUsage;
+
+
+-- HOUSE ENERGY TABLES
+createHouseEnergyUsageTableIfNeeded:
+CREATE TABLE IF NOT EXISTS DBHouseEnergyUsage (
+  epochMilliSeconds INTEGER AS Long PRIMARY KEY,
+  energy REAL NOT NULL DEFAULT 0
+);
+
+insertHouseEnergyUsage:
+INSERT OR REPLACE INTO DBHouseEnergyUsage VALUES ?;
+
+getHouseEnergyUsage:
+SELECT * FROM DBHouseEnergyUsage
+WHERE epochMilliSeconds BETWEEN :from AND :to
+;
+
+getAllHouseEnergyUsage:
+SELECT * FROM DBHouseEnergyUsage;
+
+removeHouseEnergyUsage:
+DELETE FROM DBHouseEnergyUsage
+WHERE epochMilliSeconds BETWEEN :from AND :to
+;
+
+removeAllHouseEnergyUsage:
+DELETE FROM DBHouseEnergyUsage;
+
+--SYNC STATUS TABLES
+createSyncStatusTableIfNeeded:
+CREATE TABLE IF NOT EXISTS DBSyncStatus(
+tableName TEXT PRIMARY KEY,
+mostRecentTime INTEGER AS Long NOT NULL,
+leastRecentTime INTEGER AS Long NOT NULL,
+startTime INTEGER AS Long
+);
+
+insertSyncStatus:
+INSERT OR REPLACE INTO DBSyncStatus
+VALUES ?;
+
+getSyncStatus:
+SELECT * FROM DBSyncStatus
+WHERE (:tableName = NULL OR :tableName = tableName);
+
+removeSyncStatus:
+DELETE FROM DBSyncStatus
+WHERE (:tableName = NULL OR :tableName = tableName);
