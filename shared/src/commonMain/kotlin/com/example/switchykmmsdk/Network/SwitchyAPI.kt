@@ -56,7 +56,7 @@ fun HttpRequestBuilder.addParams(params: Params?) {
 }
 
 interface APIAuthorizationDelegate {
-    suspend fun getAccessToken(): String?
+    fun getAccessToken(): String?
 }
 
 internal class SwitchyAPI(private val authDelegate: APIAuthorizationDelegate) {

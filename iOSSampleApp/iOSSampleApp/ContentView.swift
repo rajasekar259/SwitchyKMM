@@ -7,42 +7,57 @@
 
 import SwiftUI
 import switchykmmsdk
+import SwiftUIGraphs
 
 struct ContentView: View {
     @StateObject var viewModel = ContentViewModel()
+    @State var selectedChart: DYBarDataSet?
     
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text(viewModel.greetingText)
-            Button(action: {
-                viewModel.loadData()
-            }, label: {
-                Text("Load Greeting")
-            })
-            Button(action: {
-                viewModel.fetchNewer()
-            }, label: {
-                Text("Fetch New")
-            })
+            DYBarChartView(barDataSets: [
+                .init(fractions: [
+                    .init(value: 4, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "0"),
+                
+                    .init(fractions: [
+                        .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "1"),
+                
+                .init(fractions: [
+                    .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "2"),
+                
+                    .init(fractions: [
+                        .init(value: 4, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "0"),
+                    
+                        .init(fractions: [
+                            .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "1"),
+                    
+                    .init(fractions: [
+                        .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "2"),
+                
+                    .init(fractions: [
+                        .init(value: 4, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "0"),
+                    
+                        .init(fractions: [
+                            .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "1"),
+                    
+                    .init(fractions: [
+                        .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "2"),
+                
+                    .init(fractions: [
+                        .init(value: 4, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "0"),
+                    
+                        .init(fractions: [
+                            .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "1"),
+                    
+                    .init(fractions: [
+                        .init(value: 3, gradient: .linearGradient(colors: [.blue, .red, .green], startPoint: .init(x: 0, y: 0), endPoint: .init(x: 0, y: 1)))], xAxisLabel: "2"),
+            ], selectedBarDataSet: $selectedChart)
             
             Button(action: {
-                viewModel.fetchOlder()
+                viewModel.loadEnergyData()
             }, label: {
-                Text("Fetch Old")
+                Text("Load data")
             })
-            Button(action: {
-                viewModel.fetchItems()
-            }, label: {
-                Text("Fetch")
-            })
-            ScrollView {
-                ForEach(viewModel.items, id: \.id) { item in
-                    Text(item.displayString)
-                }
-            }
         }
         .padding()
     }
@@ -70,7 +85,7 @@ class Authenticator: APIAuthorizationDelegate {
     private init() {}
     static let shared = Authenticator()
     func getAccessToken() async throws -> String? {
-        "eyJraWQiOiJMZTZpVEtObUZvMmNiakVmKzhWYVJzejRDK0lxRTZpWG4yZGRFSDVHc2hJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhZGM1MjdmYy05MmMwLTRkMDgtYjZhZS0wMjE1ZmQ1Yjk0YzUiLCJldmVudF9pZCI6IjAyYWNmZDFmLWZiNjUtNGQ0NC04ZmYyLTJjNmRmNWE2Y2VlMCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MDgwMDM5MDYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfUzZxaEhMdnB3IiwiZXhwIjoxNzA4MDA3NTA2LCJpYXQiOjE3MDgwMDM5MDYsImp0aSI6IjUyN2U2MTAxLTE4NTItNDQyYS1iZWZmLWJiOWZhMmY4ZmQxYSIsImNsaWVudF9pZCI6IjNudTlvcDQ5Nm4xaWFuNGh2Y21mMXZkZTQwIiwidXNlcm5hbWUiOiJ0ZXN0In0.iIlK1iprf7Ximvl4pXhw0p-nbAbNJc4V4HujGRoH_u5d5ajARNHK4IE0-LtYJIPOduWi8cX_nr31eWXvzOeTlrwl8BNRu0vglovo9U3RGRt9P-fAqE8geyF0-mzIZYvNry5DTOw19op61zt8wA6_O2khSzgbL74U1IBMFzNCOnyYf89LShMtWANaP2GiQldhUMvLUh0Riiqzgk_VzIVfG_4_tawr9_b8XmsoH7dezxzzYQClp1r6MPprCWwZUuTRF2J-r3gm-COkHdXRkgOoxfOegS5tmddrnA6bR4Y3wmxYBwpstT_kccMJ9bgKOcoepT8joJBEWgcT-kEdUl5_Bw"
+        "eyJraWQiOiJMZTZpVEtObUZvMmNiakVmKzhWYVJzejRDK0lxRTZpWG4yZGRFSDVHc2hJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhZGM1MjdmYy05MmMwLTRkMDgtYjZhZS0wMjE1ZmQ1Yjk0YzUiLCJldmVudF9pZCI6IjAyYWNmZDFmLWZiNjUtNGQ0NC04ZmYyLTJjNmRmNWE2Y2VlMCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MDgwMDM5MDYsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfUzZxaEhMdnB3IiwiZXhwIjoxNzA4NDA5NTcxLCJpYXQiOjE3MDg0MDU5NzEsImp0aSI6ImYyMzYxMmI3LWZjZjQtNDQ4Yy04YmU1LWMxOWZiZDRiZGFhYSIsImNsaWVudF9pZCI6IjNudTlvcDQ5Nm4xaWFuNGh2Y21mMXZkZTQwIiwidXNlcm5hbWUiOiJ0ZXN0In0.FgJxBnohprzrnl8htbVFSWAdoPvTRtWF9vHZ37t9CiOnuzqJXZYitP2Gu7fJ9nniYPFV_XhpRBlH2YFcVKA49-8X6FB02A2OhUhnhsOibN6F4O6dKGXPTscTt6AbUPC66FOKaUa6iKcx4Uz6DVjiAur97MmHb4nzzZz6X9IFr_D-crNAenlGHBnnmAsfFidvYuyW7icA9-tJFMnwatKsPckCPYpLTiXoj0e_wPyTSqNNRV1U8zhIu8iT_LacUPR4SNvmbxd4Hal3bsH_MZM41fzVQMLAU_9IqIInO0XgN3dAOUcd1OYwVbHyxrftVArw2nJNdKImc0q9d5_sa1mgLQ"
     }
 }
 
@@ -90,14 +105,19 @@ class ContentViewModel: ObservableObject {
     }
     
     func getItems() {
+        
+    }
+    
+    func loadEnergyData() {
+        let now = Date().timeIntervalSince1970
+        let fiveDaysBack = Date(timeIntervalSince1970: now - 60 * 60 * 24 * 5).timeIntervalSince1970
+        
         Task {
-            let items = try? await sdk.getAllHousePowerUsages()
-            self.items = items?.map({
-                PowerUsage(
-                    time: TimeInterval($0.epochMilliSeconds),
-                    usage: Double($0.power)
-                )
-            }) ?? []
+            let items = try await sdk.getEnergyData(deviceId: deviceId, from: Int64(fiveDaysBack), to: Int64(now))
+            print(items)
+            
+            let powerUsages = try await sdk.getPowerUsages(deviceId: deviceId, from: Int64(fiveDaysBack), to: Int64(now))
+            print(powerUsages)
         }
     }
     

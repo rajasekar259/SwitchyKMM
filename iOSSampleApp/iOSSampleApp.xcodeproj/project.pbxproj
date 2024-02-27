@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		28147F292B7E536100695CB4 /* SwiftUIGraphs in Frameworks */ = {isa = PBXBuildFile; productRef = 28147F282B7E536100695CB4 /* SwiftUIGraphs */; };
+		281BFB1D2B83B09B0024D3AA /* Platform.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB0B2B83B09B0024D3AA /* Platform.kt */; };
+		281BFB1E2B83B09B0024D3AA /* Database.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB0D2B83B09B0024D3AA /* Database.kt */; };
+		281BFB1F2B83B09B0024D3AA /* HousePowerUsage.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB0F2B83B09B0024D3AA /* HousePowerUsage.kt */; };
+		281BFB202B83B09B0024D3AA /* SwitchyAPI.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB112B83B09B0024D3AA /* SwitchyAPI.kt */; };
+		281BFB212B83B09B0024D3AA /* SwitchyKMMSDK.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB122B83B09B0024D3AA /* SwitchyKMMSDK.kt */; };
+		281BFB222B83B09B0024D3AA /* Greeting.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB132B83B09B0024D3AA /* Greeting.kt */; };
+		281BFB232B83B09B0024D3AA /* AppDatabase.sq in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB162B83B09B0024D3AA /* AppDatabase.sq */; };
+		281BFB242B83B09B0024D3AA /* Platform.ios.kt in Resources */ = {isa = PBXBuildFile; fileRef = 281BFB1C2B83B09B0024D3AA /* Platform.ios.kt */; };
 		282592B82B3328060035F651 /* iOSSampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282592B72B3328060035F651 /* iOSSampleAppApp.swift */; };
 		282592BA2B3328060035F651 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282592B92B3328060035F651 /* ContentView.swift */; };
 		282592BC2B3328080035F651 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 282592BB2B3328080035F651 /* Assets.xcassets */; };
@@ -16,6 +25,14 @@
 
 /* Begin PBXFileReference section */
 		118B26260202B8B93CC9047B /* Pods-iOSSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSSampleApp.release.xcconfig"; path = "Target Support Files/Pods-iOSSampleApp/Pods-iOSSampleApp.release.xcconfig"; sourceTree = "<group>"; };
+		281BFB0B2B83B09B0024D3AA /* Platform.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Platform.kt; sourceTree = "<group>"; };
+		281BFB0D2B83B09B0024D3AA /* Database.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Database.kt; sourceTree = "<group>"; };
+		281BFB0F2B83B09B0024D3AA /* HousePowerUsage.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HousePowerUsage.kt; sourceTree = "<group>"; };
+		281BFB112B83B09B0024D3AA /* SwitchyAPI.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwitchyAPI.kt; sourceTree = "<group>"; };
+		281BFB122B83B09B0024D3AA /* SwitchyKMMSDK.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwitchyKMMSDK.kt; sourceTree = "<group>"; };
+		281BFB132B83B09B0024D3AA /* Greeting.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Greeting.kt; sourceTree = "<group>"; };
+		281BFB162B83B09B0024D3AA /* AppDatabase.sq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AppDatabase.sq; sourceTree = "<group>"; };
+		281BFB1C2B83B09B0024D3AA /* Platform.ios.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Platform.ios.kt; sourceTree = "<group>"; };
 		282592B42B3328060035F651 /* iOSSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		282592B72B3328060035F651 /* iOSSampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSSampleAppApp.swift; sourceTree = "<group>"; };
 		282592B92B3328060035F651 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -31,15 +48,154 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE71B712C103C3B24E16CAA7 /* Pods_iOSSampleApp.framework in Frameworks */,
+				28147F292B7E536100695CB4 /* SwiftUIGraphs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		281BFB052B83B0700024D3AA /* KMMSDK */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB062B83B09B0024D3AA /* commonMain */,
+				281BFB172B83B09B0024D3AA /* iosMain */,
+			);
+			path = KMMSDK;
+			sourceTree = "<group>";
+		};
+		281BFB062B83B09B0024D3AA /* commonMain */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB072B83B09B0024D3AA /* kotlin */,
+				281BFB142B83B09B0024D3AA /* sqldelight */,
+			);
+			name = commonMain;
+			path = ../../shared/src/commonMain;
+			sourceTree = "<group>";
+		};
+		281BFB072B83B09B0024D3AA /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB082B83B09B0024D3AA /* com */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		281BFB082B83B09B0024D3AA /* com */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB092B83B09B0024D3AA /* example */,
+			);
+			path = com;
+			sourceTree = "<group>";
+		};
+		281BFB092B83B09B0024D3AA /* example */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB0A2B83B09B0024D3AA /* switchykmmsdk */,
+			);
+			path = example;
+			sourceTree = "<group>";
+		};
+		281BFB0A2B83B09B0024D3AA /* switchykmmsdk */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB0B2B83B09B0024D3AA /* Platform.kt */,
+				281BFB0C2B83B09B0024D3AA /* Cache */,
+				281BFB0E2B83B09B0024D3AA /* Entity */,
+				281BFB102B83B09B0024D3AA /* Network */,
+				281BFB122B83B09B0024D3AA /* SwitchyKMMSDK.kt */,
+				281BFB132B83B09B0024D3AA /* Greeting.kt */,
+			);
+			path = switchykmmsdk;
+			sourceTree = "<group>";
+		};
+		281BFB0C2B83B09B0024D3AA /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB0D2B83B09B0024D3AA /* Database.kt */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
+		281BFB0E2B83B09B0024D3AA /* Entity */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB0F2B83B09B0024D3AA /* HousePowerUsage.kt */,
+			);
+			path = Entity;
+			sourceTree = "<group>";
+		};
+		281BFB102B83B09B0024D3AA /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB112B83B09B0024D3AA /* SwitchyAPI.kt */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		281BFB142B83B09B0024D3AA /* sqldelight */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB152B83B09B0024D3AA /* com.switchy.kmm.cache */,
+			);
+			path = sqldelight;
+			sourceTree = "<group>";
+		};
+		281BFB152B83B09B0024D3AA /* com.switchy.kmm.cache */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB162B83B09B0024D3AA /* AppDatabase.sq */,
+			);
+			path = com.switchy.kmm.cache;
+			sourceTree = "<group>";
+		};
+		281BFB172B83B09B0024D3AA /* iosMain */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB182B83B09B0024D3AA /* kotlin */,
+			);
+			name = iosMain;
+			path = ../../shared/src/iosMain;
+			sourceTree = "<group>";
+		};
+		281BFB182B83B09B0024D3AA /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB192B83B09B0024D3AA /* com */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		281BFB192B83B09B0024D3AA /* com */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB1A2B83B09B0024D3AA /* example */,
+			);
+			path = com;
+			sourceTree = "<group>";
+		};
+		281BFB1A2B83B09B0024D3AA /* example */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB1B2B83B09B0024D3AA /* switchykmmsdk */,
+			);
+			path = example;
+			sourceTree = "<group>";
+		};
+		281BFB1B2B83B09B0024D3AA /* switchykmmsdk */ = {
+			isa = PBXGroup;
+			children = (
+				281BFB1C2B83B09B0024D3AA /* Platform.ios.kt */,
+			);
+			path = switchykmmsdk;
+			sourceTree = "<group>";
+		};
 		282592AB2B3328060035F651 = {
 			isa = PBXGroup;
 			children = (
+				281BFB052B83B0700024D3AA /* KMMSDK */,
 				282592B62B3328060035F651 /* iOSSampleApp */,
 				282592B52B3328060035F651 /* Products */,
 				7EF4EFA4F9A444337DA299F8 /* Pods */,
@@ -108,6 +264,9 @@
 			dependencies = (
 			);
 			name = iOSSampleApp;
+			packageProductDependencies = (
+				28147F282B7E536100695CB4 /* SwiftUIGraphs */,
+			);
 			productName = iOSSampleApp;
 			productReference = 282592B42B3328060035F651 /* iOSSampleApp.app */;
 			productType = "com.apple.product-type.application";
@@ -136,6 +295,9 @@
 				Base,
 			);
 			mainGroup = 282592AB2B3328060035F651;
+			packageReferences = (
+				28147F272B7E536100695CB4 /* XCRemoteSwiftPackageReference "SwiftUIGraphs" */,
+			);
 			productRefGroup = 282592B52B3328060035F651 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -150,8 +312,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				281BFB242B83B09B0024D3AA /* Platform.ios.kt in Resources */,
 				282592BF2B3328080035F651 /* Preview Assets.xcassets in Resources */,
+				281BFB1E2B83B09B0024D3AA /* Database.kt in Resources */,
+				281BFB212B83B09B0024D3AA /* SwitchyKMMSDK.kt in Resources */,
+				281BFB1F2B83B09B0024D3AA /* HousePowerUsage.kt in Resources */,
+				281BFB1D2B83B09B0024D3AA /* Platform.kt in Resources */,
+				281BFB222B83B09B0024D3AA /* Greeting.kt in Resources */,
 				282592BC2B3328080035F651 /* Assets.xcassets in Resources */,
+				281BFB232B83B09B0024D3AA /* AppDatabase.sq in Resources */,
+				281BFB202B83B09B0024D3AA /* SwitchyAPI.kt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +582,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		28147F272B7E536100695CB4 /* XCRemoteSwiftPackageReference "SwiftUIGraphs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DominikButz/SwiftUIGraphs";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		28147F282B7E536100695CB4 /* SwiftUIGraphs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28147F272B7E536100695CB4 /* XCRemoteSwiftPackageReference "SwiftUIGraphs" */;
+			productName = SwiftUIGraphs;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 282592AC2B3328060035F651 /* Project object */;
 }

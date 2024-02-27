@@ -12,11 +12,10 @@ INSERT OR REPLACE INTO DBHousePowerUsage VALUES ?;
 
 getHousePowerUsage:
 SELECT * FROM DBHousePowerUsage
-WHERE epochMilliSeconds BETWEEN :from AND :to
+WHERE (:from = NULL OR epochMilliSeconds >= :from)
+AND (:to = NULL OR epochMilliSeconds <= :to)
+ORDER BY epochMilliSeconds ASC
 ;
-
-getAllHousePowerUsage:
-SELECT * FROM DBHousePowerUsage;
 
 removeHousePowerUsage:
 DELETE FROM DBHousePowerUsage
@@ -39,11 +38,10 @@ INSERT OR REPLACE INTO DBHouseEnergyUsage VALUES ?;
 
 getHouseEnergyUsage:
 SELECT * FROM DBHouseEnergyUsage
-WHERE epochMilliSeconds BETWEEN :from AND :to
+WHERE (:from = NULL OR epochMilliSeconds >= :from)
+AND (:to = NULL OR epochMilliSeconds <= :to)
+ORDER BY epochMilliSeconds ASC
 ;
-
-getAllHouseEnergyUsage:
-SELECT * FROM DBHouseEnergyUsage;
 
 removeHouseEnergyUsage:
 DELETE FROM DBHouseEnergyUsage

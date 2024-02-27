@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "swiftuigraphs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DominikButz/SwiftUIGraphs",
+      "state" : {
+        "revision" : "45f56b67df9962c885fcbbd8d72d84b13cc148d7",
+        "version" : "1.1.2"
+      }
+    }
+  ],
+  "version" : 2
+}

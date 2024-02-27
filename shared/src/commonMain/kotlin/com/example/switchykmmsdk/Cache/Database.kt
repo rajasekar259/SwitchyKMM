@@ -32,8 +32,8 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun getAllHousePowerUsages(): List<PowerUsage> {
-        return dbQuery.getAllHousePowerUsage().executeAsList().map { it.toDomainObject() }
+    fun getPowerUsages(from: Long?, to: Long?): List<PowerUsage> {
+        return dbQuery.getHousePowerUsage(from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHousePowerUsages() {
@@ -58,8 +58,8 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun getAllHouseEnergyUsages(): List<EnergyData> {
-        return dbQuery.getAllHouseEnergyUsage().executeAsList().map { it.toDomainObject() }
+    fun getAllHouseEnergyUsages(from: Long?, to: Long?): List<EnergyData> {
+        return dbQuery.getHouseEnergyUsage(from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHouseEnergyUsages() {

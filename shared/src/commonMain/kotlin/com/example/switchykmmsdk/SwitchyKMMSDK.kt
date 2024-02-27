@@ -9,7 +9,6 @@ import com.example.switchykmmsdk.Entity.SyncStatus
 import com.example.switchykmmsdk.Network.APIAuthorizationDelegate
 import com.example.switchykmmsdk.Network.SwitchyAPI
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -24,8 +23,22 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     private suspend fun removeHousePowerUsages() {
         database!!.removeHousePowerUsages()
     }
-    suspend fun getAllHousePowerUsages(): List<PowerUsage> {
-        return database!!.getAllHousePowerUsages()
+    suspend fun getAllPowerUsages(): List<PowerUsage> {
+        return database!!.getPowerUsages(null, null)
+    }
+
+    suspend fun getPowerUsages(deviceId: String, from: Long, to: Long): List<PowerUsage> {
+        val syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
+
+        if (!(syncStatus != null && syncStatus.mostRecentTime >= to && syncStatus.leastRecentTime <= from)) {
+            while ((database.getSyncStatus(DbTables.PowerUsage.name)?.mostRecentTime ?: 0) < to) {
+                if (!fetchNewerPowerUsage(deviceId)) break
+            }
+            while ((database.getSyncStatus(DbTables.PowerUsage.name)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
+                if (!fetchOlderPowerUsage(deviceId)) break
+            }
+        }
+        return database.getPowerUsages(from, to)
     }
 
     suspend fun getPowerUsageFromAPI(deviceId: String, from: Long, to: Long): Result<List<PowerUsage>> {
@@ -36,7 +49,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
         var syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
         val timeFrame = getTimeFrame(syncStatus, newData = true)
 
-        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4 * 1000) return false
+        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4) return false
 
         val data = api.getPowerUsage(deviceId, timeFrame.first, timeFrame.second).getOrNull()
 
@@ -86,7 +99,20 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     /* **** Energy Data **** */
 
     suspend fun getAllEnergyData(): List<EnergyData> {
-        return database!!.getAllHouseEnergyUsages()
+        return database!!.getAllHouseEnergyUsages(null, null)
+    }
+    suspend fun getEnergyData(deviceId: String, from: Long, to: Long): List<EnergyData> {
+        val syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
+
+        if (!(syncStatus != null && syncStatus.mostRecentTime >= to && syncStatus.leastRecentTime <= from)) {
+            while ((database.getSyncStatus(DbTables.EnergyData.name)?.mostRecentTime ?: 0) < to) {
+                if (!fetchNewerEnergyData(deviceId)) break
+            }
+            while ((database.getSyncStatus(DbTables.EnergyData.name)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
+                if (!fetchOlderEnergyData(deviceId)) break
+            }
+        }
+        return database.getAllHouseEnergyUsages(from, to)
     }
 
     suspend fun fetchOlderEnergyData(deviceId: String): Boolean {
@@ -118,7 +144,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
         var syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
         val timeFrame = getTimeFrame(syncStatus, newData = true)
 
-        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4 * 1000) return false
+        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4) return false
 
         val data = api.getEnergyData(deviceId, timeFrame.first, timeFrame.second).getOrNull()
 
@@ -140,20 +166,28 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     }
 
     private fun getTimeFrame(syncStatus: SyncStatus?, offsetDays: Long = 30, newData: Boolean): Pair<Long, Long> {
-        val offset: Long = 60 * 60 * 24 * offsetDays * 1000
-        val newerDataOffset: Long = 60 * 60 * 24 * 3 * 1000
+        val offset: Long = 60 * 60 * 24 * offsetDays
+        val newerDataOffset: Long = 60 * 60 * 24 * 3
 
         val now = Clock.System.now()
         val timeFrame: Pair<Long, Long> = if (syncStatus != null) {
             if (newData) Pair(syncStatus.mostRecentTime - newerDataOffset, min(syncStatus.mostRecentTime + offset, now.toEpochMilliseconds()))
             else Pair(syncStatus.leastRecentTime - offset, syncStatus.leastRecentTime)
         } else {
-            Pair(now.toEpochMilliseconds() - offset, now.toEpochMilliseconds())
+            Pair(now.epochSeconds - offset, now.epochSeconds)
         }
-        return timeFrame
+        return Pair(timeFrame.first, timeFrame.second)
     }
 
     suspend fun getAllLaunches(): List<RocketLaunch> {
         return api.getAllLaunches()
     }
+
+
+    suspend fun resetAllTables() {
+        database!!.removeSyncStatus(null)
+        database.removeHouseEnergyUsages()
+        database.removeHousePowerUsages()
+    }
+
 }
