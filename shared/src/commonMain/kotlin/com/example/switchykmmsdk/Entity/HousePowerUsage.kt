@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EnergyData(
-    @SerialName("time") val epochMilliSeconds: Long,
+    @SerialName("time") val epochSeconds: Long,
     val energy: Double
 )
 
 @Serializable
 data class PowerUsage(
-    @SerialName("time") val epochMilliSeconds: Long,
+    @SerialName("time") val epochSeconds: Long,
     val power: Double
 )
 

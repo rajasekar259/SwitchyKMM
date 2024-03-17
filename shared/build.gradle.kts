@@ -43,7 +43,9 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
+//            implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
+//            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
         }
 
         androidMain.dependencies {

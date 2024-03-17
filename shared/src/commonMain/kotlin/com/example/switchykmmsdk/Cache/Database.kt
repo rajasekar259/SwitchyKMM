@@ -97,22 +97,22 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
 }
 
 fun PowerUsage.toDbObject(): DBHousePowerUsage = DBHousePowerUsage(
-    this.epochMilliSeconds,
+    this.epochSeconds,
     this.power
 )
 
 fun DBHousePowerUsage.toDomainObject() = PowerUsage(
-    this.epochMilliSeconds,
+    this.epochSeconds,
     this.power
 )
 
 fun EnergyData.toDbObject(): DBHouseEnergyUsage = DBHouseEnergyUsage(
-    this.epochMilliSeconds,
+    this.epochSeconds,
     this.energy
 )
 
 fun DBHouseEnergyUsage.toDomainObject() = EnergyData (
-    this.epochMilliSeconds,
+    this.epochSeconds,
     this.energy
 )
 

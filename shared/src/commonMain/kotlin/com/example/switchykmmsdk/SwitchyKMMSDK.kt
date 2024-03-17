@@ -9,6 +9,13 @@ import com.example.switchykmmsdk.Entity.SyncStatus
 import com.example.switchykmmsdk.Network.APIAuthorizationDelegate
 import com.example.switchykmmsdk.Network.SwitchyAPI
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.format.*
+import kotlinx.datetime.toInstant
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -61,7 +68,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
                     DbTables.PowerUsage.name,
                     timeFrame.second,
                     timeFrame.first,
-                    api.getTimeBounds(deviceId).getOrNull()?.first)
+                    getStartTime(deviceId))
             }
             syncStatus.mostRecentTime = timeFrame.second
             database.insertOrUpdateSyncStatus(syncStatus)
@@ -78,7 +85,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
             false
         } else {
             if (syncStatus.startTime == null)
-                syncStatus.startTime = api.getTimeBounds(deviceId).getOrNull()?.first
+                syncStatus.startTime = getStartTime(deviceId)
 
             val timeFrame = getTimeFrame(syncStatus, newData = false)
             val data = api.getPowerUsage(deviceId, timeFrame.first, timeFrame.second)
@@ -123,7 +130,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
             false
         } else {
             if (syncStatus.startTime == null)
-                syncStatus.startTime = api.getTimeBounds(deviceId).getOrNull()?.first
+                syncStatus.startTime = getStartTime(deviceId)
 
             val timeFrame = getTimeFrame(syncStatus, newData = false)
             val data = api.getEnergyData(deviceId, timeFrame.first, timeFrame.second)
@@ -156,7 +163,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
                     DbTables.EnergyData.name,
                     timeFrame.second,
                     timeFrame.first,
-                    api.getTimeBounds(deviceId).getOrNull()?.first)
+                    getStartTime(deviceId))
             }
             syncStatus.mostRecentTime = timeFrame.second
             database.insertOrUpdateSyncStatus(syncStatus)
@@ -177,6 +184,26 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
             Pair(now.epochSeconds - offset, now.epochSeconds)
         }
         return Pair(timeFrame.first, timeFrame.second)
+    }
+
+    suspend fun putCurrentEnergyUsageInLocalCache(energy: Double) {
+        val localDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val day = localDateTime.dayOfMonth.toString().padStart(2, '0')
+        val month = localDateTime.monthNumber.toString().padStart(2, '0')
+        val year = localDateTime.year.toString()
+        val input = "${year}-${month}-${day}T00:00:00"
+        val startDate = LocalDateTime.parse(input)
+        val startTime = startDate.toInstant(TimeZone.currentSystemDefault()).epochSeconds
+
+        database!!.insertHouseEnergyUsage(listOf(
+            EnergyData(startTime, energy)
+        ))
+    }
+
+    suspend fun getStartTime(deviceId: String): Long? {
+        return database!!.getSyncStatus(DbTables.EnergyData.name)?.startTime ?:
+        database.getSyncStatus(DbTables.PowerUsage.name)?.startTime ?:
+        api.getTimeBounds(deviceId).getOrNull()?.first
     }
 
     suspend fun getAllLaunches(): List<RocketLaunch> {

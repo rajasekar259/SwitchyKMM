@@ -3,7 +3,7 @@ import kotlin.Long;
 -- HOUSE POWER TABLES
 createHousePowerUsageTableIfNeeded:
 CREATE TABLE IF NOT EXISTS DBHousePowerUsage (
-  epochMilliSeconds INTEGER AS Long PRIMARY KEY,
+  epochSeconds INTEGER AS Long PRIMARY KEY,
   power REAL NOT NULL DEFAULT 0
 );
 
@@ -12,14 +12,14 @@ INSERT OR REPLACE INTO DBHousePowerUsage VALUES ?;
 
 getHousePowerUsage:
 SELECT * FROM DBHousePowerUsage
-WHERE (:from = NULL OR epochMilliSeconds >= :from)
-AND (:to = NULL OR epochMilliSeconds <= :to)
-ORDER BY epochMilliSeconds ASC
+WHERE (:from = NULL OR epochSeconds >= :from)
+AND (:to = NULL OR epochSeconds <= :to)
+ORDER BY epochSeconds ASC
 ;
 
 removeHousePowerUsage:
 DELETE FROM DBHousePowerUsage
-WHERE epochMilliSeconds BETWEEN :from AND :to
+WHERE epochSeconds BETWEEN :from AND :to
 ;
 
 removeAllHousePowerUsage:
@@ -29,7 +29,7 @@ DELETE FROM DBHousePowerUsage;
 -- HOUSE ENERGY TABLES
 createHouseEnergyUsageTableIfNeeded:
 CREATE TABLE IF NOT EXISTS DBHouseEnergyUsage (
-  epochMilliSeconds INTEGER AS Long PRIMARY KEY,
+  epochSeconds INTEGER AS Long PRIMARY KEY,
   energy REAL NOT NULL DEFAULT 0
 );
 
@@ -38,14 +38,14 @@ INSERT OR REPLACE INTO DBHouseEnergyUsage VALUES ?;
 
 getHouseEnergyUsage:
 SELECT * FROM DBHouseEnergyUsage
-WHERE (:from = NULL OR epochMilliSeconds >= :from)
-AND (:to = NULL OR epochMilliSeconds <= :to)
-ORDER BY epochMilliSeconds ASC
+WHERE (:from = NULL OR epochSeconds >= :from)
+AND (:to = NULL OR epochSeconds <= :to)
+ORDER BY epochSeconds ASC
 ;
 
 removeHouseEnergyUsage:
 DELETE FROM DBHouseEnergyUsage
-WHERE epochMilliSeconds BETWEEN :from AND :to
+WHERE epochSeconds BETWEEN :from AND :to
 ;
 
 removeAllHouseEnergyUsage:
