@@ -9,6 +9,7 @@ import com.example.switchykmmsdk.Entity.SyncStatus
 import com.example.switchykmmsdk.Network.APIAuthorizationDelegate
 import com.example.switchykmmsdk.Network.SwitchyAPI
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -55,6 +56,14 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     suspend fun fetchNewerPowerUsage(deviceId: String): Boolean {
         var syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
         val timeFrame = getTimeFrame(syncStatus, newData = true)
+
+        if (syncStatus != null) {
+            val lastFetchLocalDateTime = Instant.fromEpochSeconds(syncStatus.mostRecentTime)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+            val currentLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+            if (lastFetchLocalDateTime.dayOfMonth >= currentLocalDateTime.dayOfMonth) return false
+        }
 
         if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4) return false
 
@@ -178,7 +187,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
 
         val now = Clock.System.now()
         val timeFrame: Pair<Long, Long> = if (syncStatus != null) {
-            if (newData) Pair(syncStatus.mostRecentTime - newerDataOffset, min(syncStatus.mostRecentTime + offset, now.toEpochMilliseconds()))
+            if (newData) Pair(syncStatus.mostRecentTime - newerDataOffset, min(syncStatus.mostRecentTime + offset, now.epochSeconds))
             else Pair(syncStatus.leastRecentTime - offset, syncStatus.leastRecentTime)
         } else {
             Pair(now.epochSeconds - offset, now.epochSeconds)
