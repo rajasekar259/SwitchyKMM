@@ -55,18 +55,10 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
 
     suspend fun fetchNewerPowerUsage(deviceId: String): Boolean {
         var syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
+        if (syncStatus != null &&
+            Clock.System.now().epochSeconds - syncStatus.mostRecentTime <= 60 * 60 * 2) return false
+
         val timeFrame = getTimeFrame(syncStatus, newData = true)
-
-        if (syncStatus != null) {
-            val lastFetchLocalDateTime = Instant.fromEpochSeconds(syncStatus.mostRecentTime)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-            val currentLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
-            if (lastFetchLocalDateTime.dayOfMonth >= currentLocalDateTime.dayOfMonth) return false
-        }
-
-        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4) return false
-
         val data = api.getPowerUsage(deviceId, timeFrame.first, timeFrame.second).getOrNull()
 
         return if (data != null) {
@@ -156,30 +148,36 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
         }
     }
     suspend fun fetchEnergyDataFromAPI(deviceId: String, from: Long, to: Long) = api.getEnergyData(deviceId, from, to)
-    suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
-        var syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
-        val timeFrame = getTimeFrame(syncStatus, newData = true)
+    
+suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
+    var syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
+    val timeFrame = getTimeFrame(syncStatus, newData = true)
 
-        if (abs(timeFrame.second - timeFrame.first) < 60 * 60 * 24 * 4) return false
+    if (syncStatus != null) {
+        val lastFetchLocalDateTime = Instant.fromEpochSeconds(syncStatus.mostRecentTime)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+        val currentLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val data = api.getEnergyData(deviceId, timeFrame.first, timeFrame.second).getOrNull()
-
-        return if (data != null) {
-            database.insertHouseEnergyUsage(data)
-
-            if (syncStatus == null) {
-                syncStatus = SyncStatus(
-                    DbTables.EnergyData.name,
-                    timeFrame.second,
-                    timeFrame.first,
-                    getStartTime(deviceId))
-            }
-            syncStatus.mostRecentTime = timeFrame.second
-            database.insertOrUpdateSyncStatus(syncStatus)
-
-            true
-        } else false
+        if (lastFetchLocalDateTime.dayOfMonth == currentLocalDateTime.dayOfMonth) return false
     }
+
+    val data = api.getEnergyData(deviceId, timeFrame.first, timeFrame.second).getOrNull()
+
+    return if (data != null) {
+        database.insertHouseEnergyUsage(data)
+
+        if (syncStatus == null) {
+            syncStatus = SyncStatus(
+                DbTables.EnergyData.name,
+                timeFrame.second,
+                timeFrame.first,
+                getStartTime(deviceId))
+        }
+        syncStatus.mostRecentTime = timeFrame.second
+        database.insertOrUpdateSyncStatus(syncStatus)
+        true
+    } else false
+}
 
     private fun getTimeFrame(syncStatus: SyncStatus?, offsetDays: Long = 30, newData: Boolean): Pair<Long, Long> {
         val offset: Long = 60 * 60 * 24 * offsetDays
