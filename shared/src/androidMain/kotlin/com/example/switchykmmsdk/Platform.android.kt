@@ -11,7 +11,7 @@ class AndroidPlatform : Platform {
 
 actual fun getPlatform(): Platform = AndroidPlatform()
 
-actual class DatabaseDriverFactory(private val context: Context, private val dbName: String) {
+actual class DatabaseDriverFactory(private val context: Context, private val dbName: String, actual val houseId: String) {
     actual fun createDriver(): SqlDriver {
         return AndroidSqliteDriver(AppDatabase.Schema, context, "$dbName.db")
     }

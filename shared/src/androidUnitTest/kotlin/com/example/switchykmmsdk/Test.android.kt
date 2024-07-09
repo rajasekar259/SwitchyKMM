@@ -16,8 +16,6 @@ class AndroidGreetingTest {
             }
         })
 
-        sdk.putCurrentEnergyUsageInLocalCache(325)
-
         runBlocking {
             val launches = sdk.getAllLaunches()
             println(launches)

@@ -3,8 +3,10 @@ import kotlin.Long;
 -- HOUSE POWER TABLES
 createHousePowerUsageTableIfNeeded:
 CREATE TABLE IF NOT EXISTS DBHousePowerUsage (
-  epochSeconds INTEGER AS Long PRIMARY KEY,
-  power REAL NOT NULL DEFAULT 0
+  houseId TEXT NOT NULL,
+  epochSeconds INTEGER AS Long NOT NULL,
+  power REAL NOT NULL DEFAULT 0,
+  PRIMARY KEY (houseId, epochSeconds)
 );
 
 insertHousePowerUsage:
@@ -12,14 +14,16 @@ INSERT OR REPLACE INTO DBHousePowerUsage VALUES ?;
 
 getHousePowerUsage:
 SELECT * FROM DBHousePowerUsage
-WHERE (:from = NULL OR epochSeconds >= :from)
+WHERE :houseId = houseId
+AND (:from = NULL OR epochSeconds >= :from)
 AND (:to = NULL OR epochSeconds <= :to)
 ORDER BY epochSeconds ASC
 ;
 
 removeHousePowerUsage:
 DELETE FROM DBHousePowerUsage
-WHERE epochSeconds BETWEEN :from AND :to
+WHERE :houseId = houseId
+AND epochSeconds BETWEEN :from AND :to
 ;
 
 removeAllHousePowerUsage:
@@ -29,8 +33,10 @@ DELETE FROM DBHousePowerUsage;
 -- HOUSE ENERGY TABLES
 createHouseEnergyUsageTableIfNeeded:
 CREATE TABLE IF NOT EXISTS DBHouseEnergyUsage (
-  epochSeconds INTEGER AS Long PRIMARY KEY,
-  energy REAL NOT NULL DEFAULT 0
+  houseId TEXT NOT NULL,
+  epochSeconds INTEGER AS Long NOT NULL,
+  energy REAL NOT NULL DEFAULT 0,
+  PRIMARY KEY (houseId, epochSeconds)
 );
 
 insertHouseEnergyUsage:
@@ -38,14 +44,16 @@ INSERT OR REPLACE INTO DBHouseEnergyUsage VALUES ?;
 
 getHouseEnergyUsage:
 SELECT * FROM DBHouseEnergyUsage
-WHERE (:from = NULL OR epochSeconds >= :from)
+WHERE :houseId = houseId
+AND (:from = NULL OR epochSeconds >= :from)
 AND (:to = NULL OR epochSeconds <= :to)
 ORDER BY epochSeconds ASC
 ;
 
 removeHouseEnergyUsage:
 DELETE FROM DBHouseEnergyUsage
-WHERE epochSeconds BETWEEN :from AND :to
+WHERE :houseId = houseId
+AND epochSeconds BETWEEN :from AND :to
 ;
 
 removeAllHouseEnergyUsage:
@@ -54,10 +62,12 @@ DELETE FROM DBHouseEnergyUsage;
 --SYNC STATUS TABLES
 createSyncStatusTableIfNeeded:
 CREATE TABLE IF NOT EXISTS DBSyncStatus(
-tableName TEXT PRIMARY KEY,
+houseId TEXT NOT NULL,
+tableName TEXT NOT NULL,
 mostRecentTime INTEGER AS Long NOT NULL,
 leastRecentTime INTEGER AS Long NOT NULL,
-startTime INTEGER AS Long
+startTime INTEGER AS Long,
+PRIMARY KEY (houseId, tableName)
 );
 
 insertSyncStatus:
@@ -66,8 +76,10 @@ VALUES ?;
 
 getSyncStatus:
 SELECT * FROM DBSyncStatus
-WHERE (:tableName = NULL OR :tableName = tableName);
+WHERE :houseId = houseId
+AND (:tableName = NULL OR :tableName = tableName);
 
 removeSyncStatus:
 DELETE FROM DBSyncStatus
-WHERE (:tableName = NULL OR :tableName = tableName);
+WHERE :houseId = houseId
+AND (:tableName = NULL OR :tableName = tableName);

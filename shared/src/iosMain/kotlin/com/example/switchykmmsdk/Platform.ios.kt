@@ -11,7 +11,7 @@ class IOSPlatform: Platform {
 
 actual fun getPlatform(): Platform = IOSPlatform()
 
-actual class DatabaseDriverFactory(private val dbName: String) {
+actual class DatabaseDriverFactory(private val dbName: String, actual val houseId: String) {
     actual fun createDriver(): SqlDriver {
         return NativeSqliteDriver(AppDatabase.Schema, "$dbName.db")
     }

@@ -8,5 +8,6 @@ interface Platform {
 expect fun getPlatform(): Platform
 
 expect class DatabaseDriverFactory {
+    val houseId: String
     fun createDriver(): SqlDriver
 }

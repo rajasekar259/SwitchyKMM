@@ -14,6 +14,7 @@ enum class DbTables {
     PowerUsage,
 }
 internal class Database(driverFactory: DatabaseDriverFactory) {
+    private val houseId = driverFactory.houseId
     private val appDatabase = AppDatabase(driverFactory.createDriver())
     private val dbQuery = appDatabase.appDatabaseQueries
 
@@ -24,7 +25,7 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
     }
 
     fun insertHousePowerUsage(powerUsages: List<PowerUsage>) {
-        val dbPowerUsages = powerUsages.map { it.toDbObject() }
+        val dbPowerUsages = powerUsages.map { it.toDbObject(houseId) }
         dbQuery.transaction {
             dbPowerUsages.forEach {
                 dbQuery.insertHousePowerUsage(it)
@@ -33,7 +34,7 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
     }
 
     fun getPowerUsages(from: Long?, to: Long?): List<PowerUsage> {
-        return dbQuery.getHousePowerUsage(from, to).executeAsList().map { it.toDomainObject() }
+        return dbQuery.getHousePowerUsage(houseId, from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHousePowerUsages() {
@@ -44,13 +45,13 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
 
     fun removeHousePowerUsages(fromEpochMills: Long, toEpochMillis: Long) {
         dbQuery.transaction {
-            dbQuery.removeHousePowerUsage(fromEpochMills, toEpochMillis)
+            dbQuery.removeHousePowerUsage(houseId, fromEpochMills, toEpochMillis)
         }
     }
 
 
     fun insertHouseEnergyUsage(energyData: List<EnergyData>) {
-        val dbEnergyData = energyData.map { it.toDbObject() }
+        val dbEnergyData = energyData.map { it.toDbObject(houseId) }
         dbQuery.transaction {
             dbEnergyData.forEach {
                 dbQuery.insertHouseEnergyUsage(it)
@@ -59,7 +60,7 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
     }
 
     fun getAllHouseEnergyUsages(from: Long?, to: Long?): List<EnergyData> {
-        return dbQuery.getHouseEnergyUsage(from, to).executeAsList().map { it.toDomainObject() }
+        return dbQuery.getHouseEnergyUsage(houseId, from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHouseEnergyUsages() {
@@ -70,33 +71,34 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
 
     fun removeHouseEnergyUsages(fromEpochMills: Long, toEpochMillis: Long) {
         dbQuery.transaction {
-            dbQuery.removeHouseEnergyUsage(fromEpochMills, toEpochMillis)
+            dbQuery.removeHouseEnergyUsage(houseId, fromEpochMills, toEpochMillis)
         }
     }
 
     fun getSyncStatus(tableName: String): SyncStatus? {
-        return dbQuery.getSyncStatus(tableName)
+        return dbQuery.getSyncStatus(houseId, tableName)
             .executeAsList()
             .firstOrNull()
             ?.toDomainObject()
     }
     fun getAllSyncStatus(): List<SyncStatus> {
-        return dbQuery.getSyncStatus(null)
+        return dbQuery.getSyncStatus(houseId,null)
             .executeAsList()
             .map { it.toDomainObject() }
     }
     fun insertOrUpdateSyncStatus(syncStatus: SyncStatus) {
-        dbQuery.insertSyncStatus(syncStatus.toDbObject())
+        dbQuery.insertSyncStatus(syncStatus.toDbObject(houseId))
     }
 
     fun removeSyncStatus(tableName: String?) {
         dbQuery.transaction {
-            dbQuery.removeSyncStatus(tableName)
+            dbQuery.removeSyncStatus(houseId, tableName)
         }
     }
 }
 
-fun PowerUsage.toDbObject(): DBHousePowerUsage = DBHousePowerUsage(
+fun PowerUsage.toDbObject(houseId: String): DBHousePowerUsage = DBHousePowerUsage(
+    houseId,
     this.epochSeconds,
     this.power
 )
@@ -106,7 +108,8 @@ fun DBHousePowerUsage.toDomainObject() = PowerUsage(
     this.power
 )
 
-fun EnergyData.toDbObject(): DBHouseEnergyUsage = DBHouseEnergyUsage(
+fun EnergyData.toDbObject(houseId: String): DBHouseEnergyUsage = DBHouseEnergyUsage(
+    houseId,
     this.epochSeconds,
     this.energy
 )
@@ -116,7 +119,8 @@ fun DBHouseEnergyUsage.toDomainObject() = EnergyData (
     this.energy
 )
 
-fun SyncStatus.toDbObject(): DBSyncStatus = DBSyncStatus(
+fun SyncStatus.toDbObject(houseId: String): DBSyncStatus = DBSyncStatus(
+    houseId,
     this.tableName,
     this.mostRecentTime,
     this.leastRecentTime,
