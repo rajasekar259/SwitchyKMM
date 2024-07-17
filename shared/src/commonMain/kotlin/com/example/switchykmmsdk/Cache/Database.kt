@@ -24,8 +24,8 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         dbQuery.createSyncStatusTableIfNeeded()
     }
 
-    fun insertHousePowerUsage(powerUsages: List<PowerUsage>) {
-        val dbPowerUsages = powerUsages.map { it.toDbObject(houseId) }
+    fun insertHousePowerUsage(powerUsages: List<PowerUsage>, deviceId: String) {
+        val dbPowerUsages = powerUsages.map { it.toDbObject(houseId, deviceId) }
         dbQuery.transaction {
             dbPowerUsages.forEach {
                 dbQuery.insertHousePowerUsage(it)
@@ -33,8 +33,8 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun getPowerUsages(from: Long?, to: Long?): List<PowerUsage> {
-        return dbQuery.getHousePowerUsage(houseId, from, to).executeAsList().map { it.toDomainObject() }
+    fun getPowerUsages(from: Long?, to: Long?, deviceId: String): List<PowerUsage> {
+        return dbQuery.getHousePowerUsage(houseId, deviceId, from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHousePowerUsages() {
@@ -43,15 +43,15 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun removeHousePowerUsages(fromEpochMills: Long, toEpochMillis: Long) {
+    fun removeHousePowerUsages(fromEpochMills: Long, toEpochMillis: Long, deviceId: String) {
         dbQuery.transaction {
-            dbQuery.removeHousePowerUsage(houseId, fromEpochMills, toEpochMillis)
+            dbQuery.removeHousePowerUsage(houseId, deviceId, fromEpochMills, toEpochMillis)
         }
     }
 
 
-    fun insertHouseEnergyUsage(energyData: List<EnergyData>) {
-        val dbEnergyData = energyData.map { it.toDbObject(houseId) }
+    fun insertHouseEnergyUsage(energyData: List<EnergyData>, deviceId: String) {
+        val dbEnergyData = energyData.map { it.toDbObject(houseId, deviceId) }
         dbQuery.transaction {
             dbEnergyData.forEach {
                 dbQuery.insertHouseEnergyUsage(it)
@@ -59,8 +59,8 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun getAllHouseEnergyUsages(from: Long?, to: Long?): List<EnergyData> {
-        return dbQuery.getHouseEnergyUsage(houseId, from, to).executeAsList().map { it.toDomainObject() }
+    fun getAllHouseEnergyUsages(from: Long?, to: Long?, deviceId: String): List<EnergyData> {
+        return dbQuery.getHouseEnergyUsage(houseId, deviceId, from, to).executeAsList().map { it.toDomainObject() }
     }
 
     fun removeHouseEnergyUsages() {
@@ -69,36 +69,43 @@ internal class Database(driverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun removeHouseEnergyUsages(fromEpochMills: Long, toEpochMillis: Long) {
+    fun removeHouseEnergyUsages(fromEpochMills: Long, toEpochMillis: Long, deviceId: String) {
         dbQuery.transaction {
-            dbQuery.removeHouseEnergyUsage(houseId, fromEpochMills, toEpochMillis)
+            dbQuery.removeHouseEnergyUsage(houseId, deviceId, fromEpochMills, toEpochMillis)
         }
     }
 
-    fun getSyncStatus(tableName: String): SyncStatus? {
-        return dbQuery.getSyncStatus(houseId, tableName)
+    fun getSyncStatus(tableName: String, deviceId: String): SyncStatus? {
+        return dbQuery.getSyncStatus(houseId, deviceId, tableName)
             .executeAsList()
             .firstOrNull()
             ?.toDomainObject()
     }
-    fun getAllSyncStatus(): List<SyncStatus> {
-        return dbQuery.getSyncStatus(houseId,null)
+    fun getAllSyncStatus(deviceId: String): List<SyncStatus> {
+        return dbQuery.getSyncStatus(houseId, deviceId,null)
             .executeAsList()
             .map { it.toDomainObject() }
     }
-    fun insertOrUpdateSyncStatus(syncStatus: SyncStatus) {
-        dbQuery.insertSyncStatus(syncStatus.toDbObject(houseId))
+    fun insertOrUpdateSyncStatus(syncStatus: SyncStatus, deviceId: String) {
+        dbQuery.insertSyncStatus(syncStatus.toDbObject(houseId, deviceId))
     }
 
-    fun removeSyncStatus(tableName: String?) {
+    fun removeSyncStatus(tableName: String?, deviceId: String) {
         dbQuery.transaction {
-            dbQuery.removeSyncStatus(houseId, tableName)
+            dbQuery.removeSyncStatus(houseId, deviceId, tableName)
+        }
+    }
+
+    fun removeAllSyncStatus() {
+        dbQuery.transaction {
+            dbQuery.removeAllSyncStatus()
         }
     }
 }
 
-fun PowerUsage.toDbObject(houseId: String): DBHousePowerUsage = DBHousePowerUsage(
+fun PowerUsage.toDbObject(houseId: String, deviceId: String): DBHousePowerUsage = DBHousePowerUsage(
     houseId,
+    deviceId,
     this.epochSeconds,
     this.power
 )
@@ -108,8 +115,9 @@ fun DBHousePowerUsage.toDomainObject() = PowerUsage(
     this.power
 )
 
-fun EnergyData.toDbObject(houseId: String): DBHouseEnergyUsage = DBHouseEnergyUsage(
+fun EnergyData.toDbObject(houseId: String, deviceId: String): DBHouseEnergyUsage = DBHouseEnergyUsage(
     houseId,
+    deviceId,
     this.epochSeconds,
     this.energy
 )
@@ -119,8 +127,9 @@ fun DBHouseEnergyUsage.toDomainObject() = EnergyData (
     this.energy
 )
 
-fun SyncStatus.toDbObject(houseId: String): DBSyncStatus = DBSyncStatus(
+fun SyncStatus.toDbObject(houseId: String, deviceId: String): DBSyncStatus = DBSyncStatus(
     houseId,
+    deviceId,
     this.tableName,
     this.mostRecentTime,
     this.leastRecentTime,

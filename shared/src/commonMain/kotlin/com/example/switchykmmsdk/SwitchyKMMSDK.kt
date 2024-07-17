@@ -25,28 +25,28 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     private val api = SwitchyAPI(authDelegate)
 
     /* **** Power Usages **** */
-    private suspend fun insertHousePowerUsage(powerUsages: List<PowerUsage>) {
-        database!!.insertHousePowerUsage(powerUsages)
+    private suspend fun insertHousePowerUsage(powerUsages: List<PowerUsage>, deviceId: String) {
+        database!!.insertHousePowerUsage(powerUsages, deviceId)
     }
     private suspend fun removeHousePowerUsages() {
         database!!.removeHousePowerUsages()
     }
-    suspend fun getAllPowerUsages(): List<PowerUsage> {
-        return database!!.getPowerUsages(null, null)
+    suspend fun getAllPowerUsages(deviceId: String): List<PowerUsage> {
+        return database!!.getPowerUsages(null, null, deviceId)
     }
 
     suspend fun getPowerUsages(deviceId: String, from: Long, to: Long): List<PowerUsage> {
-        val syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
+        val syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name, deviceId)
 
         if (!(syncStatus != null && syncStatus.mostRecentTime >= to && syncStatus.leastRecentTime <= from)) {
-            while ((database.getSyncStatus(DbTables.PowerUsage.name)?.mostRecentTime ?: 0) < to) {
+            while ((database.getSyncStatus(DbTables.PowerUsage.name, deviceId)?.mostRecentTime ?: 0) < to) {
                 if (!fetchNewerPowerUsage(deviceId)) break
             }
-            while ((database.getSyncStatus(DbTables.PowerUsage.name)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
+            while ((database.getSyncStatus(DbTables.PowerUsage.name, deviceId)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
                 if (!fetchOlderPowerUsage(deviceId)) break
             }
         }
-        return database.getPowerUsages(from, to)
+        return database.getPowerUsages(from, to, deviceId)
     }
 
     suspend fun getPowerUsageFromAPI(deviceId: String, from: Long, to: Long): Result<List<PowerUsage>> {
@@ -54,7 +54,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     }
 
     suspend fun fetchNewerPowerUsage(deviceId: String): Boolean {
-        var syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
+        var syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name, deviceId)
         if (syncStatus != null &&
             Clock.System.now().epochSeconds - syncStatus.mostRecentTime <= 60 * 60 * 2) return false
 
@@ -62,7 +62,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
         val data = api.getPowerUsage(deviceId, timeFrame.first, timeFrame.second).getOrNull()
 
         return if (data != null) {
-            database.insertHousePowerUsage(data)
+            database.insertHousePowerUsage(data, deviceId)
 
             if (syncStatus == null) {
                 syncStatus = SyncStatus(
@@ -72,14 +72,14 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
                     getStartTime(deviceId))
             }
             syncStatus.mostRecentTime = timeFrame.second
-            database.insertOrUpdateSyncStatus(syncStatus)
+            database.insertOrUpdateSyncStatus(syncStatus, deviceId)
 
             true
         } else false
     }
 
     suspend fun fetchOlderPowerUsage(deviceId: String): Boolean {
-        val syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name)
+        val syncStatus = database!!.getSyncStatus(DbTables.PowerUsage.name, deviceId)
         return if (syncStatus == null) {
             fetchNewerPowerUsage(deviceId)
         } else if (syncStatus.leastRecentTime == -1L) {
@@ -93,11 +93,11 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
                 .getOrNull()
 
             if (data != null) {
-                database.insertHousePowerUsage(data)
+                database.insertHousePowerUsage(data, deviceId)
                 syncStatus.leastRecentTime = if (timeFrame.first <= (syncStatus.startTime
                         ?: 0L)
                 ) timeFrame.first else -1L
-                database.insertOrUpdateSyncStatus(syncStatus)
+                database.insertOrUpdateSyncStatus(syncStatus, deviceId)
                 true
             } else false
         }
@@ -106,25 +106,25 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
 
     /* **** Energy Data **** */
 
-    suspend fun getAllEnergyData(): List<EnergyData> {
-        return database!!.getAllHouseEnergyUsages(null, null)
+    suspend fun getAllEnergyData(deviceId: String): List<EnergyData> {
+        return database!!.getAllHouseEnergyUsages(null, null, deviceId)
     }
     suspend fun getEnergyData(deviceId: String, from: Long, to: Long): List<EnergyData> {
-        val syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
+        val syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name, deviceId)
 
         if (!(syncStatus != null && syncStatus.mostRecentTime >= to && syncStatus.leastRecentTime <= from)) {
-            while ((database.getSyncStatus(DbTables.EnergyData.name)?.mostRecentTime ?: 0) < to) {
+            while ((database.getSyncStatus(DbTables.EnergyData.name, deviceId)?.mostRecentTime ?: 0) < to) {
                 if (!fetchNewerEnergyData(deviceId)) break
             }
-            while ((database.getSyncStatus(DbTables.EnergyData.name)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
+            while ((database.getSyncStatus(DbTables.EnergyData.name, deviceId)?.leastRecentTime ?: Long.MAX_VALUE) > from) {
                 if (!fetchOlderEnergyData(deviceId)) break
             }
         }
-        return database.getAllHouseEnergyUsages(from, to)
+        return database.getAllHouseEnergyUsages(from, to, deviceId)
     }
 
     suspend fun fetchOlderEnergyData(deviceId: String): Boolean {
-        val syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
+        val syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name, deviceId)
         return if (syncStatus == null) {
             fetchNewerEnergyData(deviceId)
         } else if (syncStatus.leastRecentTime == -1L) {
@@ -138,11 +138,11 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
                 .getOrNull()
 
             if (data != null) {
-                database.insertHouseEnergyUsage(data)
+                database.insertHouseEnergyUsage(data, deviceId)
                 syncStatus.leastRecentTime = if (timeFrame.first <= (syncStatus.startTime
                         ?: 0L)
                 ) timeFrame.first else -1L
-                database.insertOrUpdateSyncStatus(syncStatus)
+                database.insertOrUpdateSyncStatus(syncStatus, deviceId)
                 true
             } else false
         }
@@ -150,7 +150,7 @@ class SwitchyKMMSDK(driverFactory: DatabaseDriverFactory?, authDelegate: APIAuth
     suspend fun fetchEnergyDataFromAPI(deviceId: String, from: Long, to: Long) = api.getEnergyData(deviceId, from, to)
     
 suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
-    var syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name)
+    var syncStatus = database!!.getSyncStatus(DbTables.EnergyData.name, deviceId)
     val timeFrame = getTimeFrame(syncStatus, newData = true)
 
     if (syncStatus != null) {
@@ -164,7 +164,7 @@ suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
     val data = api.getEnergyData(deviceId, timeFrame.first, timeFrame.second).getOrNull()
 
     return if (data != null) {
-        database.insertHouseEnergyUsage(data)
+        database.insertHouseEnergyUsage(data, deviceId)
 
         if (syncStatus == null) {
             syncStatus = SyncStatus(
@@ -174,7 +174,7 @@ suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
                 getStartTime(deviceId))
         }
         syncStatus.mostRecentTime = timeFrame.second
-        database.insertOrUpdateSyncStatus(syncStatus)
+        database.insertOrUpdateSyncStatus(syncStatus, deviceId)
         true
     } else false
 }
@@ -193,7 +193,7 @@ suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
         return Pair(timeFrame.first, timeFrame.second)
     }
 
-    suspend fun putCurrentEnergyUsageInLocalCache(energy: Double) {
+    suspend fun putCurrentEnergyUsageInLocalCache(energy: Double, deviceId: String) {
         val localDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val day = localDateTime.dayOfMonth.toString().padStart(2, '0')
         val month = localDateTime.monthNumber.toString().padStart(2, '0')
@@ -204,12 +204,12 @@ suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
 
         database!!.insertHouseEnergyUsage(listOf(
             EnergyData(startTime, energy)
-        ))
+        ), deviceId)
     }
 
     suspend fun getStartTime(deviceId: String): Long? {
-        return database!!.getSyncStatus(DbTables.EnergyData.name)?.startTime ?:
-        database.getSyncStatus(DbTables.PowerUsage.name)?.startTime ?:
+        return database!!.getSyncStatus(DbTables.EnergyData.name, deviceId)?.startTime ?:
+        database.getSyncStatus(DbTables.PowerUsage.name, deviceId)?.startTime ?:
         api.getTimeBounds(deviceId).getOrNull()?.first
     }
 
@@ -217,9 +217,8 @@ suspend fun fetchNewerEnergyData(deviceId: String): Boolean {
         return api.getAllLaunches()
     }
 
-
     suspend fun resetAllTables() {
-        database!!.removeSyncStatus(null)
+        database!!.removeAllSyncStatus()
         database.removeHouseEnergyUsages()
         database.removeHousePowerUsages()
     }
