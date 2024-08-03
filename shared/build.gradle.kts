@@ -38,6 +38,7 @@ kotlin {
     sourceSets {
 
         commonMain.dependencies {
+            //noinspection UseTomlInstead
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -49,11 +50,13 @@ kotlin {
         }
 
         androidMain.dependencies {
+            //noinspection UseTomlInstead
             implementation("io.ktor:ktor-client-android:$ktorVersion")
             implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
         }
 
         iosMain.dependencies {
+            //noinspection UseTomlInstead
             implementation("io.ktor:ktor-client-darwin:$ktorVersion")
             implementation("com.squareup.sqldelight:native-driver:$sqlDelightVersion")
         }
