@@ -1,0 +1,8 @@
+framework module switchykmmsdk {
+    umbrella header "switchykmmsdk.h"
+
+    export *
+    module * { export * }
+
+    use Foundation
+}
