@@ -3,7 +3,6 @@ Pod::Spec.new do |spec|
     spec.version                  = '1.0'
     spec.homepage                 = 'https://github.com/rajasekar259/SwitchyKMM'
     spec.source                   = { :git => 'https://github.com/rajasekar259/SwitchyKMM.git', :tag => spec.version.to_s }
-    spec.source_files             = 'shared/src/commonMain/kotlin/**/*', 'shared/src/iosMain/kotlin/**/*'
     spec.authors                  = ''
     spec.license                  = ''
     spec.summary                  = 'Some description for the Shared Module'
